@@ -13,8 +13,9 @@ const gameState = (
   state = {
     reseting: false,
     updateing: false,
-    boardState: [[]],
-    winner: null
+    boardState: [],
+    winner: null,
+    currentTurn: 0
   },
   action
 ) => {
@@ -29,6 +30,7 @@ const gameState = (
         ...state,
         initializing: false,
         boardState: action.boardState,
+        currentTurn: 0,
         winner:null
       };
     case RESET_BOARD_ERROR:
@@ -49,18 +51,19 @@ const gameState = (
         updateing: false
       };
     case CHANGE_BOARD_VALUE_SUCCESS:
+      const { currentTurn } = state 
+      const nextTurn = currentTurn === 0 ? 1 :0
       return {
         ...state,
         updateing: false,
-        boardState: action.boardState
+        boardState: action.boardState,
+        currentTurn: nextTurn
       };
     case SET_WINNER:
-      console.log("++++++++", action.winner)
       return{
         ...state,
         reseting: false,
         updateing: false,
-        state: [[]],
         winner:action.winner
       }
     case INVALIDATE_BOARD:
@@ -68,7 +71,7 @@ const gameState = (
         ...state,
         reseting: false,
         updateing: false,
-        state: [[]],
+        state: [],
         winner:null
       };
     default:

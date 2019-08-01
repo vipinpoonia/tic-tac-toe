@@ -26,46 +26,69 @@ export const getUpdateMatrix = (currentBoardState, row, col) =>{
   return currentBoardState
 }
 
-const isWinInRow = (board, streak) => {
+const isPlayerWin = (board, streak, player) => {
   const rowMax = board.length
-  const colMax  = board[0].length
-  if (board[0][0]===1 && board[0][1]===1 && board[0][2]=== 1 ||
-      board[1][0]===1 &&  board[1][1]===1 &&  board[1][2]=== 1 ||
-      board[2][0]===1 &&  board[2][1]===1 &&  board[2][2]=== 1
-  ){
-    return 1
+  const colMax = board[0].length
+  var result = []
+  for(let r = 0; r < rowMax; r++) {
+    var temp = []
+    for(let c = 0; c < colMax; c++) {
+      var el = board[r][c]
+      el = el === player ? 1 : 0
+      temp.push([el, el, el, el])
+    }
+    result.push(temp)
   }
-  if (board[0][0]===0 && board[0][1]===0 && board[0][2]=== 0 ||
-    board[1][0]===0 &&  board[1][1]===0 &&  board[1][2]=== 0 ||
-    board[2][0]===0 &&  board[2][1]===0 &&  board[2][2]=== 0
-  ){
-    return 0
+  for(let r = 0; r < rowMax; r++) {
+    for(let c = 0; c < colMax; c++) {
+      if (board[r][c]===player){
+        const topLeft = (r>0 && c>0) ? result[r-1][c-1][0] : 0
+        const top = r>0 ? result[r-1][c][1] : 0
+        const topRight = (r>0 && (c+1)<colMax) ? result[r-1][c+1][2]: 0
+        const left = c>0 ? result[r][c-1][3] : 0
+        result[r][c][0] = topLeft+1
+        result[r][c][1] = top+1
+        result[r][c][2] = topRight+1
+        result[r][c][3] = left+1
+      }
+    }
   }
-  return null
-}
-
-const isWinInColumn = (board, streak) => {
-  const rowMax = board.length
-  const colMax  = board[0].length
+  for(let r = 0; r < rowMax; r++) {
+    for(let c = 0; c < colMax; c++) {
+      for(let dir = 0; dir < 4; dir++) { 
+        if (result[r][c][dir] === streak){
+          return true
+        }
+      }
+    }
+  }
   return false
-}
+};
 
-const isWinInDiagonal = (board, streak) => {
+const isBoardFull = (board) => {
   const rowMax = board.length
-  const colMax  = board[0].length
-  return false
-}
-
-const isWinInAntiDiagonal = (board, streak) => {
-  const rowMax = board.length
-  const colMax  = board[0].length
-  return false
+  const colMax = board[0].length
+  for(var r = 0; r < rowMax; r++) {
+    for(var c = 0; c < colMax; c++) {
+      if (board[r][c]==null){
+        return false
+      }
+    }
+  }
+  return true
 }
 
 export const isWin = (board, streak) => {
-  var row = isWinInRow(board, streak)
-  if (row !== null){
-    return row
+  const isPlayerOneWin = isPlayerWin(board, streak, 1)
+  if (isPlayerOneWin){
+    return 1
+  }
+  const isPlayerZeroWin = isPlayerWin(board, streak, 0)
+  if (isPlayerZeroWin){
+    return 0
+  }
+  if (isBoardFull(board)){
+    return 2
   }
   return null
 };

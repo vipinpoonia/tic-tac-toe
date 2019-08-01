@@ -1,13 +1,13 @@
 import {
   SET_BOARD_DIMENSIONS,
-  SET_BOARD_DIMENSIONS_ERROR,
+  // SET_BOARD_DIMENSIONS_ERROR,
   SET_BOARD_DIMENSIONS_SUCCESS,
   SET_STREAK_SIZE,
-  SET_STREAK_SIZE_ERROR,
+  // SET_STREAK_SIZE_ERROR,
   SET_STREAK_SIZE_SUCCESS,
 
   RESET_BOARD,
-  RESET_BOARD_ERROR,
+  // RESET_BOARD_ERROR,
   RESET_BOARD_SUCCESS,
   CHANGE_BOARD_VALUE,
   CHANGE_BOARD_VALUE_ERROR,
@@ -64,13 +64,18 @@ export const updateStreakCount = streak => (dispatch, getState) => {
   })
 };
 
-export const setWinner = winner => (dispatch, getState) => {
+export const setWinner = winner => (dispatch) => {
   dispatch({
     type: SET_WINNER,
     winner: winner
   });
 };
 
+export const restartGame = () => (dispatch, getState) => {
+  const row = getState().initializeGame.row;
+  const column = getState().initializeGame.column;
+  resetBoard(row, column)(dispatch)
+};
 
 export const updateBoardCell = (row, col) => (dispatch, getState) => {
   dispatch({type: CHANGE_BOARD_VALUE});
@@ -81,16 +86,12 @@ export const updateBoardCell = (row, col) => (dispatch, getState) => {
   if (currentBoardState[row][col] == null){
     const newState = getUpdateMatrix(result, row, col)
     const winer = isWin(newState, streak)
+    dispatch({
+      type: CHANGE_BOARD_VALUE_SUCCESS,
+      boardState: newState
+    })
     if (winer !== null){
       setWinner(winer)(dispatch)
-      const row = getState().initializeGame.row;
-      const column = getState().initializeGame.column;
-      resetBoard(row, column)(dispatch)
-    }else{
-      dispatch({
-        type: CHANGE_BOARD_VALUE_SUCCESS,
-        boardState: newState
-      })
     }
   }else{
     dispatch({
